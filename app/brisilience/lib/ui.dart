@@ -124,17 +124,27 @@ class ShortTermPage extends StatelessWidget {
         Card(
           child: Column(
             children: [
-              Text('Fire Risk', style: theme.textTheme.headlineMedium),
+              Align(alignment: Alignment.centerLeft, child: Text('Fire Risk', style: theme.textTheme.headlineMedium)),
               SvgPicture.asset('assets/fire-risk.svg', semanticsLabel: 'Fire Risk ${appState.fireRiskDesc}',)
             ],
           ),
         ),
-        ListTile(
-          title: const Text('Fire Risk')
+        Card(
+          child: Column(
+            children: [
+              Align(alignment: Alignment.centerLeft, child: Text('Flood Risk', style: theme.textTheme.headlineMedium)),
+              Container(height: 60, child: Placeholder(),),
+            ],
+          ),
         ),
-        ListTile(
-          title: const Text('Flood Risk'),
-        )
+        Card(
+          child: Column(
+            children: [
+              Align(alignment: Alignment.centerLeft, child: Text('Cyclone Risk', style: theme.textTheme.headlineMedium)),
+              Container(height: 60, child: Placeholder(),),
+            ],
+          ),
+        ),
       ]
 
 
@@ -145,6 +155,9 @@ class ShortTermPage extends StatelessWidget {
 class LocationIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return Stack(children: [
+      Align(alignment: Alignment.centerLeft, child: Text('Location: Waiting on GPS...')),
+      Align(alignment: Alignment.centerRight, child: CircularProgressIndicator())
+    ],);
   }
 }
