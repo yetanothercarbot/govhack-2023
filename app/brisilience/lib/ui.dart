@@ -46,9 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
           floatingActionButton: Visibility(
             visible: selectedPageIndex == 2,
             child: FloatingActionButton(
-              child: const Icon(Icons.edit), 
               backgroundColor: Colors.blueAccent,
-              onPressed: () {selectedPageIndex = 3;}
+              onPressed: () {selectedPageIndex = 3;},
+              child: const Icon(Icons.edit), 
               )
           ),
           drawer: Drawer(
@@ -116,26 +116,33 @@ class ShortTermPage extends StatelessWidget {
     return SafeArea(child: ListView(
       children: [
         Card(
-          child: Column(
+          child: ExpansionTile(
+            title: Text('Fire Risk'),
+            subtitle: Text('High'),
+            initiallyExpanded: true,
+            trailing: Icon(Icons.warning_amber),
             children: [
-              Align(alignment: Alignment.centerLeft, child: Text('Fire Risk', style: theme.textTheme.headlineMedium)),
-              SvgPicture.asset('assets/fire-risk.svg', semanticsLabel: 'Fire Risk ${appState.fireRiskDesc}',)
+              Card(
+                child: Text('QFES has issued a Watch and Act for a fire that is currently 6.9km from your address.'),
+              ),
+              SvgPicture.asset('assets/fire-risk-high.svg', semanticsLabel: 'Fire Risk ${appState.fireRiskDesc}',)
             ],
           ),
         ),
         Card(
-          child: Column(
+          child: ExpansionTile(
+            title: Text('Flood Risk'),
+            subtitle: Text('Not currently at risk'),
             children: [
-              Align(alignment: Alignment.centerLeft, child: Text('Flood Risk', style: theme.textTheme.headlineMedium)),
-              Align(alignment: Alignment.bottomRight, child: Text('Not currently at risk', style: theme.textTheme.headlineSmall),),
+              Text('This uses data from water level sensors situated in nearby creeks and rivers. Based on their levels, your location should not be at risk of flooding currently '),
             ],
           ),
         ),
         Card(
-          child: Column(
+          child: ExpansionTile(
+            title: Text('Cyclone Risk'),
             children: [
-              Align(alignment: Alignment.centerLeft, child: Text('Cyclone Risk', style: theme.textTheme.headlineMedium)),
-              Container(height: 60, child: Placeholder(),),
+              SizedBox(height: 60, child: Placeholder(),),
             ],
           ),
         ),
@@ -155,25 +162,31 @@ class LongTermPage extends StatelessWidget {
 
     return SafeArea(child: ListView(
       children: [
-        ExpansionTile(
-          title: Text('Flooding Potential'),
-          subtitle: Text('High Risk'),
-          children: [
-            Text('This is a high-risk area. Consider stocking sandbags and making sure you know your escape routes.'),
-          ],
+        Card(
+          child: ExpansionTile(
+            title: Text('Flooding Potential'),
+            subtitle: Text('High Risk - Action Needed'),
+            children: [
+              Text('This is a high-risk area. Consider stocking sandbags and making sure you know your escape routes. Please fill out your survival plan!'),
+            ],
+          ),
         ),
-        ExpansionTile(
-          title: Text('Bushfire Risk'),
-          subtitle: Text('Low Risk - No Action Needed'),
-          children: [
-            Text('You shouldn\'t need to do anything. Make sure to fill out your survival plan.'),
-          ],
+        Card(
+          child: ExpansionTile(
+            title: Text('Bushfire Risk'),
+            subtitle: Text('Low Risk - No Action Needed'),
+            children: [
+              Text('You shouldn\'t need to do anything. Make sure to fill out your survival plan.'),
+            ],
+          ),
         ),
-        ExpansionTile(
-          title: Text('Cyclone Risk'),
-          children: [
-            Container(height: 60, child: Placeholder(),),
-          ],
+        Card(
+          child: ExpansionTile(
+            title: Text('Cyclone Risk'),
+            children: [
+              SizedBox(height: 60, child: Placeholder(),),
+            ],
+          ),
         ),
       ]
 
