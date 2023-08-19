@@ -1,8 +1,10 @@
+import 'package:brisilience/api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'ui.dart';
 
 void main() {
+  var api = BrisilienceApi();
   runApp(MyApp());
 }
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
         title: 'Brisilience',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
         home: MyHomePage(title: "Brisilience"),
       ),
