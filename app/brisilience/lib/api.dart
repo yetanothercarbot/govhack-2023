@@ -19,22 +19,30 @@ class LongTermDanger {
 
 }
 
+/*
+ * Container object for ShortTermDanger, LongTermDanger and some metadata
+ * (such as converting lat/lon to address)
+ */
+class ApiResponse {
+
+}
+
 /* 
  * This object holds the connection with the API. The API is stateless, but 
  * it is nonetheless an easier way of dealing with it.
  */
-class BrisilienceAPI {
-  var baseUrl;
+class BrisilienceApi {
+  late String _baseUrl;
 
   BrisilienceAPI(String baseUrl) {
-    this.baseUrl = baseUrl;
+    _baseUrl = baseUrl;
 
     // Check if it is present and valid
 
   }
 
   Future<bool> check() async {
-    final response = await http.get(Uri.parse(this.baseUrl + '/ping'));
+    final response = await http.get(Uri.parse('$_baseUrl/ping'));
 
     return jsonDecode(response.body)['success'] == 1;
   }
