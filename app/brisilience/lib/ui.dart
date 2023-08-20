@@ -1,4 +1,6 @@
+import 'package:brisilience/api.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -107,7 +109,6 @@ class _MyHomePageState extends State<MyHomePage> {
 class ShortTermPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
     final theme = Theme.of(context);
 
     return SafeArea(child: ListView(
@@ -122,7 +123,7 @@ class ShortTermPage extends StatelessWidget {
               Card(
                 child: Text('QFES has issued a Watch and Act for a fire that is currently 6.5km from your address. Please review your survival plan and be prepared to take action.'),
               ),
-              SvgPicture.asset('assets/fire-risk-high.svg', semanticsLabel: 'Fire Risk ${appState.fireRiskDesc}',)
+              SvgPicture.asset('assets/fire-risk-high.svg', semanticsLabel: 'Fire Risk PLACEHOLDER',) // TODO
             ],
           ),
         ),
@@ -154,9 +155,6 @@ class LongTermPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    final theme = Theme.of(context);
-
     return SafeArea(child: ListView(
       children: [
         Card(
@@ -271,9 +269,25 @@ class SurvivalPlan extends StatelessWidget {
 class LocationIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      Align(alignment: Alignment.centerLeft, child: Text('Location: Waiting on GPS...')),
-      Align(alignment: Alignment.centerRight, child: CircularProgressIndicator())
-    ],);
+    var response = context.watch<MyAppState>().response;
+    return FutureBuilder<apiResponse>(
+      future: response,
+      builder: ((context, snapshot) {
+        if (snapshot.hasData) {
+          return Stack(
+          children: [
+            Align(alignment: Alignment.centerLeft, child: Text('Location: ${snapshot.data!.address}')),
+          ],);
+        } else if (snapshot.hasError) {
+          return Placeholder();
+        }
+        
+        return Stack(
+          children: [
+            Align(alignment: Alignment.centerLeft, child: Text('Waiting on GPS...')), // TODO
+            Align(alignment: Alignment.centerRight, child: CircularProgressIndicator())
+          ],);
+      }),
+    );
   }
 }

@@ -1,40 +1,37 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
 
 /*
- * This represents short-term danger (i.e. ones that are likely to be an issue 
- * within the next day or so). 
+ *
+ * 
  */
-class ShortTermDanger {
+class apiResponse {
+  late String position;
+  late int fireRiskIndex;
+  late String fireRiskDesc;
+  late String address;
 
-}
+  apiResponse(String? responseBody) {
+    if (responseBody == null) {
+      address = 'Failed.';
+    } else {
+      final decodedResponse = jsonDecode(responseBody);
+      address = decodedResponse['corridor_long_name'];
+    }
 
-/*
- * This represents long-term risks that are encountered at the address given.
- * Currently only based on historical flood data, but also designed for
- * bushfire risk and to be expandable.
- */
-class LongTermDanger {
-
-}
-
-/*
- * Container object for ShortTermDanger, LongTermDanger and some metadata
- * (such as converting lat/lon to address)
- */
-class ApiResponse {
-
+  }
 }
 
 /* 
  * This object holds the connection with the API. The API is stateless, but 
  * it is nonetheless an easier way of dealing with it.
  */
-class BrisilienceApi {
+class serverApi {
   late String _baseUrl;
 
-  BrisilienceAPI(String baseUrl) {
+
+  serverApi(String baseUrl) {
     _baseUrl = baseUrl;
 
     // Check if it is present and valid
@@ -47,4 +44,65 @@ class BrisilienceApi {
     return jsonDecode(response.body)['success'] == 1;
   }
 
+  Future<apiResponse> fetch() async {
+    print('Called fetch()');
+    // First get the location
+    Position currPos = await _determinePosition();
+
+    print('${currPos.latitude}, ${currPos.longitude}');
+    try {
+      print('$_baseUrl/riskdata?lat=${currPos.latitude}&long=${currPos.longitude}');
+      final response = await http.get(Uri.parse('$_baseUrl/riskdata?lat=${currPos.latitude}&long=${currPos.longitude}'));
+      return apiResponse(response.body);
+    } on Error catch (err) {
+      print('Failed to call API: $err');
+      return apiResponse(null);
+    }
+    
+
+  }
+
+}
+
+
+/// Determine the current position of the device.
+///
+/// When the location services are not enabled or permissions
+/// are denied the `Future` will return an error.
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // Test if location services are enabled.
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // Location services are not enabled don't continue
+    // accessing the position and request users of the 
+    // App to enable the location services.
+    print('Location services are disabled');
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Permissions are denied, next time you could try
+      // requesting permissions again (this is also where
+      // Android's shouldShowRequestPermissionRationale 
+      // returned true. According to Android guidelines
+      // your App should show an explanatory UI now.
+      return Future.error('Location permissions are denied');
+    }
+  }
+  
+  if (permission == LocationPermission.deniedForever) {
+    // Permissions are denied forever, handle appropriately. 
+    return Future.error(
+      'Location permissions are permanently denied, we cannot request permissions.');
+  } 
+
+  // When we reach here, permissions are granted and we can
+  // continue accessing the position of the device.
+  return await Geolocator.getCurrentPosition();
 }
