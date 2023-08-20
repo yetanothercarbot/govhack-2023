@@ -160,7 +160,7 @@ class Webserver:
               "corridor_long_name": address['formatted_address'],
               "postcode": self.get_addr_component(address, 'postal_code')['long_name'],
               "state": self.get_addr_component(address, 'administrative_area_level_1')['long_name'],
-              "postcode": self.get_addr_component(address, 'country')['long_name'],
+              "country": self.get_addr_component(address, 'country')['long_name'],
             }
 
         return web.json_response(resp, status=200, headers={'Access-Control-Allow-Origin': '*'})
