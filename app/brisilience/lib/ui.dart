@@ -117,7 +117,7 @@ class ShortTermPage extends StatelessWidget {
             title: Text('Fire Risk'),
             subtitle: Text('High - Watch and Act - Action Needed.'),
             initiallyExpanded: true,
-            trailing: Icon(Icons.warning_amber),
+            trailing: Icon(Icons.warning),
             children: [
               Card(
                 child: Text('QFES has issued a Watch and Act for a fire that is currently 6.5km from your address. Please review your survival plan and be prepared to take action.'),
@@ -201,8 +201,27 @@ class SurvivalPlan extends StatelessWidget {
         Card(
           child: ExpansionTile(
             title: Text('Basic details set'),
+            trailing: Icon(Icons.check),
+            expandedAlignment: Alignment.topLeft,
             children: [
-              Text('')
+              Text('\u2022 Evacuation destination: Set, and meets recommendations.\n\u2022 Exit Route: Set, and meets recommendations'),
+            ],
+          ),
+        ),
+        Card(
+          child: ExpansionTile(
+            title: Text('Survival Bag Packed'),
+            subtitle: Text('You have indicated that your go bag is packed'),
+            trailing: Icon(Icons.check),
+            expandedAlignment: Alignment.topLeft,
+            children: [
+              Text('''Your survival bag should contain:
+\u2022 Sufficient non-perishable food & drink
+\u2022 First Aid Kit
+\u2022 Radio with batteries
+\u2022 Prescription Medication
+\u2022 Sufficient fuel for evacuation
+\u2022 Photocopies of important documents (including identification, health information, prescriptions, insurance)'''),
             ],
           ),
         ),
@@ -219,25 +238,33 @@ class SurvivalPlan extends StatelessWidget {
           ),
         ],),
         ElevatedButton(
-          onPressed: () {}, 
+          onPressed: () {
+            showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Before you go...'),
+                content: SizedBox(
+                  width: 300,
+                  height: 300,
+                  child: Text('''Make sure you have the following:
+\u2022 Everybody who is evacuating with you
+\u2022 Pets or animals
+\u2022 Survival bag
+                  ''')
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            });
+          }, 
           style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
           child: Text('I\'m evacuating', style: TextStyle(fontSize: 25),)
         ),
       ],
     ),);
-  }
-}
-
-class EvacuationPrompt extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: SizedBox(
-        width: 300,
-        height: 300,
-        child: Placeholder(),
-      ),
-    );
   }
 }
 
