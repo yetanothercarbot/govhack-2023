@@ -166,8 +166,8 @@ async def import_flood_risk(db):
         )
         ON CONFLICT (LotPlan)
             DO UPDATE SET
-                HistoricalFloodRisk = COALESCE($2, EXCLUDED.HistoricalFloodRisk),
-                FloodLevel = COALESCE($3, EXCLUDED.FloodLevel)
+                HistoricalFloodRisk = COALESCE($2, FloodRiskMetrics.HistoricalFloodRisk),
+                FloodLevel = COALESCE($3, FloodRiskMetrics.FloodLevel)
     """
     stmt = await db.prepare(insert_row)
 
@@ -175,28 +175,31 @@ async def import_flood_risk(db):
     num = 1
     async with db.transaction():
         async for data in read_csv_by_line(DATA_FLOOD_AWARENESS):
-            try:
-                args = [
-                    data['LOTPLAN'],
-                    FLOOD_RISK_MAPPING[data['METRIC']] if data['METRIC'] in FLOOD_RISK_MAPPING else None,
-                    float(data['VALUE']) if data['METRIC'] == 'FL_DFL' else None,
-                ]
+            if (data['METRIC'] in FLOOD_RISK_MAPPING.keys() or data['METRIC'] == 'FL_DFL'):
+                try:
+                    args = [
+                        data['LOTPLAN'],
+                        FLOOD_RISK_MAPPING[data['METRIC']] if data['METRIC'] in FLOOD_RISK_MAPPING else None,
+                        float(data['VALUE']) if data['METRIC'] == 'FL_DFL' else None,
+                    ]
 
-                queue.append(args)
+                    #print(args)
 
-                # Don't allow the queue to grow above 100 records
-                if len(queue) >= 10000:
-                    await stmt.executemany(queue)
-                    queue = []
+                    queue.append(args)
 
-                sys.stdout.write("\r Processing record: %i" % num)
-                sys.stdout.flush()
-                num += 1
-            except ValueError:
-                pass
-            except Exception as e:
-                print(data)
-                raise e
+                    # Don't allow the queue to grow above 100 records
+                    if len(queue) >= 10000:
+                        await stmt.executemany(queue)
+                        queue = []
+
+                    sys.stdout.write("\r Processing record: %i" % num)
+                    sys.stdout.flush()
+                    num += 1
+                except ValueError:
+                    pass
+                except Exception as e:
+                    print(data)
+                    raise e
 
         await stmt.executemany(queue)
         queue = []
@@ -295,9 +298,10 @@ async def run():
         await db.execute(CREATE_LOTPLAN_TABLE)
         await db.execute(CREATE_FLOOD_RISK_METRICS_TABLE)
 
-        await import_sensors(db)
-        await import_lotplan(db)
+        #await import_sensors(db)
+        #await import_lotplan(db)
         await import_flood_risk(db)
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(run())
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())
