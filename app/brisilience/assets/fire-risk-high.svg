@@ -14,6 +14,6 @@
     </g>
     <g transform="translate(10, 115)"> <!-- Caption -->
         <rect id="captionBg" x="0" y="0" width="200" height="30" stroke="black" stroke-width="0.5" fill="#FEDD3A" />
-        <text id="captionText" x="100" y="25" font-size="25" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica, Arial, sans-serif">HIGH2</text>
+        <text id="captionText" x="100" y="25" font-size="25" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica, Arial, sans-serif">HIGH</text>
     </g>
 </svg>

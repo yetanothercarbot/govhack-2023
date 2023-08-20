@@ -30,9 +30,6 @@ class _MyHomePageState extends State<MyHomePage> {
       case 2:
         page = SurvivalPlan();
         break;
-      case 3:
-        page = SurvivalPlanEdit();
-        break;
       default:
         throw UnimplementedError('No widget for $selectedPageIndex');
     }
@@ -118,12 +115,12 @@ class ShortTermPage extends StatelessWidget {
         Card(
           child: ExpansionTile(
             title: Text('Fire Risk'),
-            subtitle: Text('High'),
+            subtitle: Text('High - Watch and Act - Action Needed.'),
             initiallyExpanded: true,
             trailing: Icon(Icons.warning_amber),
             children: [
               Card(
-                child: Text('QFES has issued a Watch and Act for a fire that is currently 6.9km from your address.'),
+                child: Text('QFES has issued a Watch and Act for a fire that is currently 6.5km from your address. Please review your survival plan and be prepared to take action.'),
               ),
               SvgPicture.asset('assets/fire-risk-high.svg', semanticsLabel: 'Fire Risk ${appState.fireRiskDesc}',)
             ],
@@ -199,20 +196,52 @@ class SurvivalPlan extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return SafeArea(child: ListView(
+      children: [
+        Card(
+          child: ExpansionTile(
+            title: Text('Basic details set'),
+            children: [
+              Text('')
+            ],
+          ),
+        ),
+        Row(children: [
+          SizedBox.expand(
+            child: ElevatedButton.icon(
+              onPressed: () {}, 
+              icon: Icon(Icons.download),
+              label: Text('Save as PDF')
+            ),
+          ),
+          SizedBox.expand(
+            child: ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.share),
+              label: Text('Share')
+            ),
+          ),
+        ],),
+        ElevatedButton(
+          onPressed: () {}, 
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+          child: Text('I\'m evacuating', style: TextStyle(fontSize: 25),)
+        ),
+      ],
+    ),);
   }
 }
 
-class SurvivalPlanEdit extends StatefulWidget {
-  @override
-  State<SurvivalPlanEdit> createState() => _SurvivalPlanEditState();
-}
-
-class _SurvivalPlanEditState extends State<SurvivalPlanEdit> {
+class EvacuationPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return AlertDialog(
+      content: SizedBox(
+        width: 300,
+        height: 300,
+        child: Placeholder(),
+      ),
+    );
   }
 }
 
