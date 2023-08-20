@@ -3,6 +3,7 @@ import asyncpg
 import json
 import aioftp
 import aiofiles
+import traceback
 from aiohttp import web, ClientSession
 from aiocache import cached, Cache
 from import_data import read_csv_by_line
@@ -43,6 +44,8 @@ class Webserver:
         for component in address['address_components']:
             if (component_name in component['types']):
                 return component
+
+        return {'short_name': "err", 'long_name': "err"}
 
     @cached(ttl=1800)
     async def sensordata(self):
@@ -113,37 +116,52 @@ class Webserver:
         LIMIT 1
         """
 
-        async with self.pool.acquire() as con:
-            flooddata = await con.fetch(sql_flooddata,
-                ' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[:-1]).upper(),
-                ' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[-1:]).upper(),
-                self.get_addr_component(address, 'street_number')['long_name'].upper(),
-                int(self.get_addr_component(address, 'postal_code')['long_name']))
-            sensorid = await con.fetch(sql_sensor, Point(float(longitude), float(latitude)).wkt)
+        resp = None
 
-        print(' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[:-1]).upper(),
-                ' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[-1:]).upper(),
-                self.get_addr_component(address, 'street_number')['long_name'].upper(),
-                int(self.get_addr_component(address, 'postal_code')['long_name']))
+        try:
+            async with self.pool.acquire() as con:
+                flooddata = await con.fetch(sql_flooddata,
+                    ' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[:-1]).upper(),
+                    ' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[-1:]).upper(),
+                    self.get_addr_component(address, 'street_number')['long_name'].upper(),
+                    int(self.get_addr_component(address, 'postal_code')['long_name']))
+                sensorid = await con.fetch(sql_sensor, Point(float(longitude), float(latitude)).wkt)
 
-        #print(sensors, sensorid[0])
+            print(' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[:-1]).upper(),
+                    ' '.join(self.get_addr_component(address, 'route')['short_name'].split(' ')[-1:]).upper(),
+                    self.get_addr_component(address, 'street_number')['long_name'].upper(),
+                    int(self.get_addr_component(address, 'postal_code')['long_name']))
 
-        stream_height = int(sensors[sensorid[0][0]]) if sensors[sensorid[0][0]].isnumeric() else 0
-        hist_flood_risk = flooddata[0][0] if flooddata[0][0] is not None else 0
-        flood_risk_height = flooddata[0][1]
-        flood_risk_curr = stream_height - flood_risk_height >= FLOOD_RISK_DIFFERENCE if flood_risk_height is not None else False
+            #print(sensors, sensorid[0])
 
-        #  Create GeoJson
-        resp = {
-          "flood_risk": hist_flood_risk,
-          "flood_risk_curr": flood_risk_curr,
-          "fire_index": await self.getfirerisk(),
-          "corridor_name": self.get_addr_component(address, 'route')['long_name'],
-          "corridor_long_name": address['formatted_address'],
-          "postcode": self.get_addr_component(address, 'postal_code')['long_name'],
-          "state": self.get_addr_component(address, 'administrative_area_level_1')['long_name'],
-          "postcode": self.get_addr_component(address, 'country')['long_name'],
-        }
+            stream_height = int(sensors[sensorid[0][0]]) if sensors[sensorid[0][0]].isnumeric() else 0
+            hist_flood_risk = flooddata[0][0] if flooddata[0][0] is not None else 0
+            flood_risk_height = flooddata[0][1]
+            flood_risk_curr = stream_height - flood_risk_height >= FLOOD_RISK_DIFFERENCE if flood_risk_height is not None else False
+
+            #  Create GeoJson
+            resp = {
+              "flood_risk": hist_flood_risk,
+              "flood_risk_curr": flood_risk_curr,
+              "fire_index": await self.getfirerisk(),
+              "corridor_name": self.get_addr_component(address, 'route')['long_name'],
+              "corridor_long_name": address['formatted_address'],
+              "postcode": self.get_addr_component(address, 'postal_code')['long_name'],
+              "state": self.get_addr_component(address, 'administrative_area_level_1')['long_name'],
+              "postcode": self.get_addr_component(address, 'country')['long_name'],
+            }
+        except Exception as e:
+            traceback.print_exc()
+            resp = {
+              "flood_risk": 3,
+              "flood_risk_curr": False,
+              "fire_index": await self.getfirerisk(),
+              "corridor_name": self.get_addr_component(address, 'route')['long_name'],
+              "corridor_long_name": address['formatted_address'],
+              "postcode": self.get_addr_component(address, 'postal_code')['long_name'],
+              "state": self.get_addr_component(address, 'administrative_area_level_1')['long_name'],
+              "postcode": self.get_addr_component(address, 'country')['long_name'],
+            }
 
         return web.json_response(resp, status=200, headers={'Access-Control-Allow-Origin': '*'})
 
