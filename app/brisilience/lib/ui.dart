@@ -207,19 +207,15 @@ class SurvivalPlan extends StatelessWidget {
           ),
         ),
         Row(children: [
-          SizedBox.expand(
-            child: ElevatedButton.icon(
-              onPressed: () {}, 
-              icon: Icon(Icons.download),
-              label: Text('Save as PDF')
-            ),
+          ElevatedButton.icon(
+            onPressed: () {}, 
+            icon: Icon(Icons.download),
+            label: Text('Save as PDF')
           ),
-          SizedBox.expand(
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.share),
-              label: Text('Share')
-            ),
+          ElevatedButton.icon(
+            onPressed: () {},
+            icon: Icon(Icons.share),
+            label: Text('Share')
           ),
         ],),
         ElevatedButton(

@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         title: 'SEQPrepare',
         theme: ThemeData(
           useMaterial3: true,
-          // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
         home: MyHomePage(title: "SEQPrepare"),
       ),
