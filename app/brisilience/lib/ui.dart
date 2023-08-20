@@ -109,22 +109,33 @@ class _MyHomePageState extends State<MyHomePage> {
 class ShortTermPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    var response = context.watch<MyAppState>().response;
 
     return SafeArea(child: ListView(
       children: [
         Card(
-          child: ExpansionTile(
-            title: Text('Fire Risk'),
-            subtitle: Text('High - Watch and Act - Action Needed.'),
-            initiallyExpanded: true,
-            trailing: Icon(Icons.warning),
-            children: [
-              Card(
-                child: Text('QFES has issued a Watch and Act for a fire that is currently 6.5km from your address. Please review your survival plan and be prepared to take action.'),
-              ),
-              SvgPicture.asset('assets/fire-risk-high.svg', semanticsLabel: 'Fire Risk PLACEHOLDER',) // TODO
-            ],
+          child: FutureBuilder<ApiResponse>(
+            future: response,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ExpansionTile(
+                  title: Text('Fire Risk'),
+                  subtitle: Text('Currently: ${snapshot.data!.fireRiskDesc}'),
+                  initiallyExpanded: true,
+                  children: [
+                    Card(
+                      child: Text('There are currently no fires near your location.'),
+                    ),
+                    SvgPicture.asset('assets/${snapshot.data!.fireRiskAsset}', semanticsLabel: snapshot.data!.fireRiskDesc,) // TODO
+                  ],
+                );
+              } else {
+                return ExpansionTile(
+                  title: Text('Fire Risk'),
+                  trailing: CircularProgressIndicator(),
+                );
+              }
+            }
           ),
         ),
         Card(
@@ -155,23 +166,35 @@ class LongTermPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var response = context.watch<MyAppState>().response;
     return SafeArea(child: ListView(
       children: [
         Card(
-          child: ExpansionTile(
-            title: Text('Flooding Potential'),
-            subtitle: Text('High Risk - Action Needed'),
-            children: [
-              Text('This is a high-risk area. Consider stocking sandbags and making sure you know your escape routes. Please fill out your survival plan!'),
-            ],
+          child: FutureBuilder<ApiResponse>(
+            future: response,
+            builder: (context, snapshot) {
+              if (snapshot.hasData){
+                return ExpansionTile(
+                  title: Text('Flooding Potential'),
+                  subtitle: Text('Risk: ${snapshot.data!.longTermFloodRisk}/4'),
+                  children: [
+                    Text('This is a high-risk area. Consider stocking sandbags and making sure you know your escape routes. Please fill out your survival plan!'),
+                  ],
+                );
+              } else {
+                return ExpansionTile(
+                  title: Text('Flooding Potential'),
+                  trailing: CircularProgressIndicator(),
+                );
+              }
+            }
           ),
         ),
         Card(
           child: ExpansionTile(
             title: Text('Bushfire Risk'),
-            subtitle: Text('Low Risk - No Action Needed'),
             children: [
-              Text('You shouldn\'t need to do anything. Make sure to fill out your survival plan.'),
+              SizedBox(height: 60, child: Placeholder(),),
             ],
           ),
         ),
@@ -270,7 +293,7 @@ class LocationIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var response = context.watch<MyAppState>().response;
-    return FutureBuilder<apiResponse>(
+    return FutureBuilder<ApiResponse>(
       future: response,
       builder: ((context, snapshot) {
         if (snapshot.hasData) {

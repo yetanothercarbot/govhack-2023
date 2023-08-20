@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   serverApi api = serverApi("https://api.seqprepare.xyz");
-  late Future<apiResponse> response;
+  late Future<ApiResponse> response;
   
   @override
   MyAppState() {

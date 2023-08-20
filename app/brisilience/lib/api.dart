@@ -6,18 +6,36 @@ import 'dart:convert';
  *
  * 
  */
-class apiResponse {
-  late String position;
-  late int fireRiskIndex;
+class ApiResponse {
+  late String fireRiskAsset;
   late String fireRiskDesc;
+  late int longTermFloodRisk;
+
   late String address;
 
-  apiResponse(String? responseBody) {
+  ApiResponse(String? responseBody) {
     if (responseBody == null) {
       address = 'Failed.';
     } else {
       final decodedResponse = jsonDecode(responseBody);
       address = decodedResponse['corridor_long_name'];
+      longTermFloodRisk = decodedResponse['flood_risk'];
+      if (decodedResponse['fire_index'] <= 11) {
+        fireRiskAsset = "fire-risk-no-rating.svg";
+        fireRiskDesc = "No Rating";
+      } else if (decodedResponse['fire_index'] <= 23) {
+        fireRiskAsset = "fire-risk-moderate.svg";
+        fireRiskDesc = "Moderate";
+      } else if (decodedResponse['fire_index'] <= 49) {
+        fireRiskAsset = "fire-risk-high.svg";
+        fireRiskDesc = "High";
+      } else if (decodedResponse['fire_index'] <= 99) {
+        fireRiskAsset = "fire-risk-extreme.svg";
+        fireRiskDesc = "Extreme";
+      } else {
+        fireRiskAsset = "fire-risk-catastrophic.svg";
+        fireRiskDesc = "Catastrophic";
+      }
     }
 
   }
@@ -44,7 +62,7 @@ class serverApi {
     return jsonDecode(response.body)['success'] == 1;
   }
 
-  Future<apiResponse> fetch() async {
+  Future<ApiResponse> fetch() async {
     print('Called fetch()');
     // First get the location
     Position currPos = await _determinePosition();
@@ -53,10 +71,10 @@ class serverApi {
     try {
       print('$_baseUrl/riskdata?lat=${currPos.latitude}&long=${currPos.longitude}');
       final response = await http.get(Uri.parse('$_baseUrl/riskdata?lat=${currPos.latitude}&long=${currPos.longitude}'));
-      return apiResponse(response.body);
+      return ApiResponse(response.body);
     } on Error catch (err) {
       print('Failed to call API: $err');
-      return apiResponse(null);
+      return ApiResponse(null);
     }
     
 
