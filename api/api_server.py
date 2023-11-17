@@ -18,9 +18,11 @@ GOOGLE_API_URL = "https://maps.googleapis.com/maps/api/geocode/json"
 
 SENSOR_DATA_URL = "https://www.data.brisbane.qld.gov.au/data/dataset/01af4647-dd69-4061-9c68-64fa43bfaac7/resource/78c37b45-ecb5-4a99-86b2-f7a514f0f447/download/gauge-data-20230819t125703.csv"
 
-FIRE_DATA_URL = "/anon/gen/fwo/IDQ13016.xml"
+CURRENT_FIRES_URL = "https://publiccontent-gis-psba-qld-gov-au.s3.amazonaws.com/content/Feeds/BushfireCurrentIncidents/bushfireAlert.json"
 
-FIRE_DATA_FILENAME = "IDQ13016.xml"
+FIRE_DANGER_URL = "/anon/gen/fwo/IDQ13016.xml"
+
+FIRE_DANGER_FILENAME = "IDQ13016.xml"
 
 BOM_FTP_URL = "ftp.bom.gov.au"
 
@@ -48,17 +50,17 @@ class Webserver:
         return {'short_name': "err", 'long_name': "err"}
 
     @cached(ttl=1800)
-    async def sensordata(self):
+    async def flood_sensor_data(self):
         async for data in read_csv_by_line(SENSOR_DATA_URL):
             return data
 
 
     @cached(ttl=1800)
-    async def getfirerisk(self):
+    async def get_fire_risk(self):
         async with aioftp.Client.context(BOM_FTP_URL, 21, "anonymous", "") as client:
-            await client.download(FIRE_DATA_URL)
+            await client.download(FIRE_DANGER_URL)
 
-        async with aiofiles.open(FIRE_DATA_FILENAME, mode='r') as f:
+        async with aiofiles.open(FIRE_DANGER_FILENAME, mode='r') as f:
             contents = await f.read()
 
         root = ET.fromstring(contents)
@@ -91,7 +93,7 @@ class Webserver:
         async with self.session.get(GOOGLE_API_URL, params=params) as resp:
             address = (await resp.json())['results'][0]
 
-        sensors = await self.sensordata()
+        sensors = await self.flood_sensor_data()
 
         sql_flooddata = """
         SELECT fm.HistoricalFloodRisk, fm.FloodLevel
@@ -143,7 +145,7 @@ class Webserver:
             resp = {
               "flood_risk": hist_flood_risk,
               "flood_risk_curr": flood_risk_curr,
-              "fire_index": await self.getfirerisk(),
+              "fire_index": await self.get_fire_risk(),
               "corridor_name": self.get_addr_component(address, 'route')['long_name'],
               "corridor_long_name": address['formatted_address'],
               "postcode": self.get_addr_component(address, 'postal_code')['long_name'],
@@ -155,7 +157,7 @@ class Webserver:
             resp = {
               "flood_risk": 3,
               "flood_risk_curr": False,
-              "fire_index": await self.getfirerisk(),
+              "fire_index": await self.get_fire_risk(),
               "corridor_name": self.get_addr_component(address, 'route')['long_name'],
               "corridor_long_name": address['formatted_address'],
               "postcode": self.get_addr_component(address, 'postal_code')['long_name'],
