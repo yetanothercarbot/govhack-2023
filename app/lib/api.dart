@@ -64,7 +64,7 @@ class ServerApi {
 
   Future<ApiResponse> fetch() async {
     // First get the location
-    Position currPos = await _determinePosition();
+    Position currPos = await determinePosition();
 
     print('${currPos.latitude}, ${currPos.longitude}');
     try {
@@ -82,11 +82,11 @@ class ServerApi {
 }
 
 
-/// Determine the current position of the device.
-///
-/// When the location services are not enabled or permissions
-/// are denied the `Future` will return an error.
-Future<Position> _determinePosition() async {
+// Determine the current position of the device.
+//
+// When the location services are not enabled or permissions
+// are denied the `Future` will return an error.
+Future<Position> determinePosition() async {
   bool serviceEnabled;
   LocationPermission permission;
 
