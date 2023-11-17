@@ -1,0 +1,8 @@
+aioftp
+asyncpg
+aiohttp
+aiocache
+aiofiles
+aiocache
+geojson
+shapely
