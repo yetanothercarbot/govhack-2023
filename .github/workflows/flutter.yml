@@ -59,7 +59,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: aqi-flower-${{github.ref_name}}-web.zip
+          filename: seqprepare-${{github.ref_name}}-web.zip
           directory: app/build/web
       - name: Web Release
         uses: softprops/action-gh-release@v1
@@ -67,7 +67,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: app/build/web/aqi-flower-${{github.ref_name}}-web.zip
+          files: app/build/web/seqprepare-${{github.ref_name}}-web.zip
 
   build-and-release-linux:
     runs-on: ubuntu-latest
@@ -94,7 +94,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: aqi-flower-${{github.ref_name}}-linux.zip
+          filename: seqprepare-${{github.ref_name}}-linux.zip
           directory: app/build/linux/x64/release/bundle
       - name: Linux Release
         uses: softprops/action-gh-release@v1
@@ -102,7 +102,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: app/build/linux/x64/release/bundle/aqi-flower-${{github.ref_name}}-linux.zip
+          files: app/build/linux/x64/release/bundle/seqprepare-${{github.ref_name}}-linux.zip
 
   build-and-release-windows:
     runs-on: windows-latest
@@ -127,7 +127,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: aqi-flower-${{github.ref_name}}-windows.zip
+          filename: seqprepare-${{github.ref_name}}-windows.zip
           directory: app/build/windows/runner/Release
       - name: Windows Release
         uses: softprops/action-gh-release@v1
@@ -135,4 +135,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: app/build/windows/runner/Release/aqi-flower-${{github.ref_name}}-windows.zip
+          files: app/build/windows/runner/Release/seqprepare-${{github.ref_name}}-windows.zip
