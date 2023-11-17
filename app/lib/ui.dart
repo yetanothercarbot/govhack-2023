@@ -322,7 +322,7 @@ class LocationIndicator extends StatelessWidget {
         
         return Stack(
           children: [
-            Align(alignment: Alignment.centerLeft, child: Text('Waiting on GPS...')), // TODO
+            Align(alignment: Alignment.centerLeft, child: Text('Waiting on location...')),
             Align(alignment: Alignment.centerRight, child: CircularProgressIndicator())
           ],);
       }),

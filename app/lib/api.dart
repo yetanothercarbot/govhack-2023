@@ -93,7 +93,7 @@ Future<Position> determinePosition() async {
   // Test if location services are enabled.
   serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
-    // Location services are not enabled don't continue
+    // Location services are not enabled; don't continue
     // accessing the position and request users of the 
     // App to enable the location services.
     print('Location services are disabled');
@@ -119,7 +119,12 @@ Future<Position> determinePosition() async {
       'Location permissions are permanently denied, we cannot request permissions.');
   } 
 
+  // Check if there is a cached location
+  Position? position = await Geolocator.getLastKnownPosition();
+
+  position ??= await Geolocator.getCurrentPosition();
+
   // When we reach here, permissions are granted and we can
   // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
+  return position;
 }

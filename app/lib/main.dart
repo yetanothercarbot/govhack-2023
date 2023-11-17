@@ -36,9 +36,9 @@ class MyAppState extends ChangeNotifier {
   
   @override
   MyAppState() {
-    response = api.fetch();
     fires = fireApi.fetch();
     pos = determinePosition();
+    response = api.fetch();
   }
 
 }
