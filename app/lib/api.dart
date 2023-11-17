@@ -45,11 +45,11 @@ class ApiResponse {
  * This object holds the connection with the API. The API is stateless, but 
  * it is nonetheless an easier way of dealing with it.
  */
-class serverApi {
+class ServerApi {
   late String _baseUrl;
 
 
-  serverApi(String baseUrl) {
+  ServerApi(String baseUrl) {
     _baseUrl = baseUrl;
 
     // Check if it is present and valid
@@ -63,7 +63,6 @@ class serverApi {
   }
 
   Future<ApiResponse> fetch() async {
-    print('Called fetch()');
     // First get the location
     Position currPos = await _determinePosition();
 

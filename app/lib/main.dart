@@ -1,7 +1,8 @@
-import 'package:brisilience/api.dart';
+
+import 'package:seqprepare/api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:seqprepare/fire_locations_api.dart';
 import 'ui.dart';
 
 void main() {
@@ -26,12 +27,15 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  serverApi api = serverApi("https://api.seqprepare.xyz");
+  FireLocationApi fireApi = FireLocationApi();
+  ServerApi api = ServerApi("https://api.seqprepare.xyz");
   late Future<ApiResponse> response;
+  late Future<Map<String, dynamic>> fires;
   
   @override
   MyAppState() {
     response = api.fetch();
+    fires = fireApi.fetch();
   }
 
 }

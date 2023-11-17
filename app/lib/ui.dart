@@ -1,8 +1,9 @@
-import 'package:brisilience/api.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:seqprepare/api.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:seqprepare/map.dart';
 
 import 'main.dart';
 
@@ -17,26 +18,30 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var selectedPageIndex = 0;
-
+  MapController mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
     Widget page;
-    switch (selectedPageIndex) {
-      case 0:
-        page = ShortTermPage();
-        break;
-      case 1:
-        page = LongTermPage();
-        break;
-      case 2:
-        page = SurvivalPlan();
-        break;
-      default:
-        throw UnimplementedError('No widget for $selectedPageIndex');
-    }
+    
     return LayoutBuilder(
       builder: (context, constraints) {
+        switch (selectedPageIndex) {
+          case 0:
+            page = ShortTermPage();
+            break;
+          case 1:
+            page = LongTermPage();
+            break;
+          case 2:
+            page = SurvivalPlan();
+            break;
+          case 3:
+            page = FiresMap(mapController: mapController, screenSize: Size(constraints.maxWidth, constraints.maxHeight));
+            break;
+          default:
+            throw UnimplementedError('No widget for $selectedPageIndex');
+        }
         return Scaffold(
           appBar: AppBar(title: Text(widget.title)), // TODO: Make background #006bb6, with a #ffd51a stripe on the right
           bottomNavigationBar: BottomAppBar(
@@ -84,7 +89,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       });
                       Navigator.pop(context);
                     },
-                  )
+                  ),
+                  ListTile(
+                    title: const Text('Current Fires'),
+                    selected: selectedPageIndex == 3,
+                    onTap: () {
+                      setState(() {
+                        selectedPageIndex = 3;
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
                 ],
               ),
             ),
