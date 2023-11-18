@@ -8,8 +8,7 @@ class FireLocationApi {
   FireLocationApi();
 
   Future<Map<String, dynamic>> fetch() async {
-    final response = await http.get(Uri.parse("https://publiccontent-gis-psba-qld-gov-au.s3.amazonaws.com/content/Feeds/BushfireCurrentIncidents/bushfireAlert.json"));
-
+    final response = await http.get(Uri.parse("https://api.seqprepare.xyz/currentfires"));
     return jsonDecode(response.body);
   }
 }
