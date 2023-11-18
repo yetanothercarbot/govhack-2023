@@ -69,6 +69,11 @@ class Webserver:
             if area.get('description') == "Southeast Coast":
                 return int(area.findall('forecast-period')[0].find('element').text)
 
+    @cached(ttl=1800)
+    async def get_current_fires(self):
+        async with self.session.get(CURRENT_FIRES_URL) as resp:
+            return web.json_response(await resp.json(), status=200, headers={'Access-Control-Allow-Origin': '*'})
+
     '''
     Returns the following to show server is up:
 
@@ -174,6 +179,7 @@ class Webserver:
         app = web.Application(loop=self.loop)
         app.router.add_route('GET', "/ping", self.ping)
         app.router.add_route('GET', "/riskdata", self.riskdata)
+        app.router.add_route('GET', "/currentfires", self.get_current_fires)
 
         return await self.loop.create_server(app.make_handler(), address, port)
 
