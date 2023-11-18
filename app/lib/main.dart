@@ -1,5 +1,4 @@
 
-import 'package:geolocator/geolocator.dart';
 import 'package:seqprepare/api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,14 +29,12 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   FireLocationApi fireApi = FireLocationApi();
   ServerApi api = ServerApi("https://api.seqprepare.xyz");
-  late Future<Position> pos;
   late Future<ApiResponse> response;
   late Future<Map<String, dynamic>> fires;
   
   @override
   MyAppState() {
     fires = fireApi.fetch();
-    pos = determinePosition();
     response = api.fetch();
   }
 

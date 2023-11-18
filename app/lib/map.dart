@@ -18,7 +18,6 @@ class FiresMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var fires = context.watch<MyAppState>().fires;
-    var pos = context.watch<MyAppState>().pos;
 
     return FutureBuilder<Map<String, dynamic>>(
       future: fires,
@@ -94,19 +93,6 @@ class FiresMap extends StatelessWidget {
             ),
             MarkerLayer(
               markers: points,
-            ),
-            FutureBuilder(
-              future: pos,
-              builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                  return MarkerLayer();
-                }
-                return MarkerLayer(
-                  markers: [
-                    Marker(point: LatLng(snapshot.data!.latitude, snapshot.data!.longitude), builder: (context) => const Icon(Icons.location_pin, size: 20, color: Colors.black,), )
-                  ],
-                );
-              }
             ),
             RichAttributionWidget(
               attributions: [

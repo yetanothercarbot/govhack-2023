@@ -119,10 +119,7 @@ Future<Position> determinePosition() async {
       'Location permissions are permanently denied, we cannot request permissions.');
   } 
 
-  // Check if there is a cached location
-  Position? position = await Geolocator.getLastKnownPosition();
-
-  position ??= await Geolocator.getCurrentPosition();
+  Position position = await Geolocator.getCurrentPosition();
 
   // When we reach here, permissions are granted and we can
   // continue accessing the position of the device.
